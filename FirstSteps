@@ -1,0 +1,24 @@
+import urllib.request, json
+
+# Configure API request
+# Note limit parameter is arbitrary value greater than total number of NPS sites
+#HEADERS in NPS GitHub doesn't run for some reason- I end up adding my API key to the initial endpoint value
+
+endpoint = "https://developer.nps.gov/api/v1/parks?limit=600&api_key=<API KEY HERE>"
+req = urllib.request.Request(endpoint)
+
+# Execute request and parse response
+
+response = urllib.request.urlopen(req).read()
+data = json.loads(response.decode('utf-8'))
+
+# Prepare and execute output
+#As of now, the only data I'm interested in are the LatLong coordinates of the parks, and the names of the parks corresponding.
+
+mylist = []
+
+for park in data["data"]:
+    mylist.append(park["fullName"] + "   " + park["latLong"])
+
+for elem in mylist:
+    print (elem)
