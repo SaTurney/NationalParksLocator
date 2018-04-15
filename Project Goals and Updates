@@ -1,0 +1,19 @@
+Using the National Park Service's API and accompanying documentation, the end user will be able to input a location, and the program
+will return the closest national parks relative to them. We'll begin with the 10 closest parks, as there are a whopping number of national
+parks (upwards of 500).
+
+
+The National Park Service's API and documentation page can be found here:
+https://www.nps.gov/subjects/developer/api-documentation.htm
+
+
+To begin, the user will input a location value. Using geopy, a Python module, the value will be converted first to the location, and then
+the location will be converted to a latitude-longitude tuple. 
+
+Documentation for the geopy module can be found here:
+https://pypi.python.org/pypi/geopy
+
+
+All national parks will be taken from the NPS API and converted to key: value pairs of {Park: LatLong Value}. Using geopy, the LatLong
+value from the user will be used to find all distances from every national park in the NPS database. This program will then list the 10
+national parks the shortest distance from the user, in ascending order.
