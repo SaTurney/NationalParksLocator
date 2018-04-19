@@ -1,0 +1,21 @@
+from geopy.geocoders import Nominatim
+from geopy import distance
+
+
+
+def user_location():
+    
+    geolocator = Nominatim()
+
+    query = input("Please enter your location! Leave out any apartment unit numbers if you have them. \n" )
+
+
+    try:
+        queried_location = geolocator.geocode(query, timeout=100)
+        print("The LatLong values for the location you entered, " + str(queried_location.address) + ", are " + str((queried_location.latitude, queried_location.longitude)))
+
+    except AttributeError:
+        print("Sorry, we can't find that location! Try simplifying it- We don't need your exact street address.")
+        return(user_location())
+
+user_location()
