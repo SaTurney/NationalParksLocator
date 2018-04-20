@@ -15,8 +15,8 @@ data = json.loads(response.decode('utf-8'))
 # Prepare and execute output
 #As of now, the only data I'm interested in are the LatLong coordinates of the parks, and the names of the parks corresponding.
 
-NPS = data["data"]
-mydict = dict((i["fullName"], i["latLong"]) for i in NPS)
+api_load = data["data"]
+nps_dict = dict((i["fullName"], i["latLong"]) for i in api_load)
 
-for key, value in mydict.items():
+for key, value in nps_dict.items():
     print(key, value)
