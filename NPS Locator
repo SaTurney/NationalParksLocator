@@ -42,12 +42,12 @@ nps_dict = dict((i["fullName"], i["latLong"]) for i in api_load)
 
 for k, v in nps_dict.items():
     v = v.replace('lat:', '')       #delete "lat" and "long" values
-    v = v.replace('long:', '') 
-    
+    v = v.replace('long:', '')
+    v = v.split(',')
+
     nps_dict[k] = v                 #saving changed values to the dictionary, so it can be called outside this loop
 
-
-
+    
 #---------------------------------------------
 
 #Here is where the program begins
@@ -72,17 +72,17 @@ def user_location():
         
         print('Now searching parks!')
 
+        for key, value in nps_dict.items():
+            try:
+                print(distance.distance(lat_long, value).miles)
 
+            except ValueError:          #Some national parks don't have this data available. SKIP!
+                pass
+            
 
     except AttributeError:
         print("Sorry, we can't find that location! Try simplifying it- We don't need your exact street address.")
         return(user_location())
 
 user_location()
-
-
-
-
-
-
 
