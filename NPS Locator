@@ -1,0 +1,88 @@
+from geopy.geocoders import Nominatim
+from geopy import distance
+import urllib.request
+import json
+
+
+
+# Configure API request
+# Note limit parameter is arbitrary value greater than total number of NPS sites
+#HEADERS in NPS GitHub doesn't run for some reason- I end up adding my API key to the initial endpoint value
+
+
+endpoint = "https://developer.nps.gov/api/v1/parks?limit=600&api_key=<KEY GOES HERE>"
+req = urllib.request.Request(endpoint)
+
+
+# Execute request and parse response
+
+
+response = urllib.request.urlopen(req).read()
+data = json.loads(response.decode('utf-8'))
+
+
+# Prepare and execute output
+#As of now, the only data I'm interested in are the LatLong coordinates of the parks, and the names of the parks corresponding.
+
+
+api_load = data["data"]
+nps_dict = dict((i["fullName"], i["latLong"]) for i in api_load)
+
+
+#for key, value in nps_dict.items():            #Don't need these just yet
+#    print(key, value)                          #These two lines are to make sure the dict is saved correctly. It is.
+
+
+
+
+
+#---------------------------------------------
+#The dictionary values need to be changed from the raw json strings, as I need integers.
+
+
+for k, v in nps_dict.items():
+    v = v.replace('lat:', '')       #delete "lat" and "long" values
+    v = v.replace('long:', '') 
+    
+    nps_dict[k] = v                 #saving changed values to the dictionary, so it can be called outside this loop
+
+
+
+#---------------------------------------------
+
+#Here is where the program begins
+    
+print("Welcome to the National Park Service locator!")
+print("We will list the ten closest national parks relative to your location with any address.")
+
+
+def user_location():
+
+    
+    geolocator = Nominatim()
+    query = input("Please enter your location! Leave out any apartment unit numbers if you have them. \n" )
+
+
+
+    try:
+        queried_location = geolocator.geocode(query, timeout=50)
+        print("The Latitude and Longitude values for the location you entered, at \n" + str(queried_location.address) + ", are\n" + str((queried_location.latitude, queried_location.longitude)))
+        
+        lat_long = (queried_location.latitude, queried_location.longitude)
+        
+        print('Now searching parks!')
+
+
+
+    except AttributeError:
+        print("Sorry, we can't find that location! Try simplifying it- We don't need your exact street address.")
+        return(user_location())
+
+user_location()
+
+
+
+
+
+
+
