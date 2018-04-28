@@ -1,8 +1,10 @@
-from geopy.geocoders import Nominatim
-from geopy import distance
 import urllib.request
 import json
-
+from geopy.geocoders import Nominatim
+from geopy import distance
+from operator import itemgetter
+from heapq import nsmallest
+import pprint
 
 
 # Configure API request
@@ -10,7 +12,7 @@ import json
 #HEADERS in NPS GitHub doesn't run for some reason- I end up adding my API key to the initial endpoint value
 
 
-endpoint = "https://developer.nps.gov/api/v1/parks?limit=600&api_key=<KEY GOES HERE>"
+endpoint = "https://developer.nps.gov/api/v1/parks?limit=600&api_key=O17lwXL5SQgtTqiGwPgY0VxBYkWWKpk8yTuCcHVl"
 req = urllib.request.Request(endpoint)
 
 
@@ -20,7 +22,7 @@ req = urllib.request.Request(endpoint)
 response = urllib.request.urlopen(req).read()
 data = json.loads(response.decode('utf-8'))
 
-
+ 
 # Prepare and execute output
 #As of now, the only data I'm interested in are the LatLong coordinates of the parks, and the names of the parks corresponding.
 
@@ -29,60 +31,72 @@ api_load = data["data"]
 nps_dict = dict((i["fullName"], i["latLong"]) for i in api_load)
 
 
-#for key, value in nps_dict.items():            #Don't need these just yet
-#    print(key, value)                          #These two lines are to make sure the dict is saved correctly. It is.
-
-
-
 
 
 #---------------------------------------------
 #The dictionary values need to be changed from the raw json strings, as I need integers.
 
 
-for k, v in nps_dict.items():
-    v = v.replace('lat:', '')       #delete "lat" and "long" values
-    v = v.replace('long:', '')
-    v = v.split(',')
+for key, value in nps_dict.items():
+    value = value.replace('lat:', '')       #delete "lat" and "long" values, and the comma separating them.
+    value = value.replace('long:', '')
+    value = value.split(',')
 
-    nps_dict[k] = v                 #saving changed values to the dictionary, so it can be called outside this loop
+    nps_dict[key] = value                 #saving changed values to the dictionary, so it can be called outside this loop
 
     
 #---------------------------------------------
 
-#Here is where the program begins
+#Here is where the program begins to the end user:
     
 print("Welcome to the National Park Service locator!")
 print("We will list the ten closest national parks relative to your location with any address.")
 
 
+distances_dict = {}
+
 def user_location():
 
     
     geolocator = Nominatim()
-    query = input("Please enter your location! Leave out any apartment unit numbers if you have them. \n" )
+    enter_location = input("Please enter your location! Leave out any apartment unit numbers if you have them. \n" )
 
 
 
     try:
-        queried_location = geolocator.geocode(query, timeout=50)
+        queried_location = geolocator.geocode(enter_location, timeout=50)
         print("The Latitude and Longitude values for the location you entered, at \n" + str(queried_location.address) + ", are\n" + str((queried_location.latitude, queried_location.longitude)))
         
-        lat_long = (queried_location.latitude, queried_location.longitude)
-        
+        user_lat_long = (queried_location.latitude, queried_location.longitude)
         print('Now searching parks!')
 
+
+
         for key, value in nps_dict.items():
-            try:
-                print(distance.distance(lat_long, value).miles)
+
+            try: 
+
+                distances = (distance.distance(user_lat_long, value).miles)
+                distances_dict[key] = distances
+
 
             except ValueError:          #Some national parks don't have this data available. SKIP!
                 pass
-            
+
+                
 
     except AttributeError:
         print("Sorry, we can't find that location! Try simplifying it- We don't need your exact street address.")
         return(user_location())
 
+    
+
+
+
 user_location()
 
+result = nsmallest(10, distances_dict.items(), key=itemgetter(1))
+
+
+print("Here are the ten closest national parks to you and their distance from you in miles:")
+pprint.pprint(result)
