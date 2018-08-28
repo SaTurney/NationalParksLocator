@@ -12,7 +12,7 @@ import pprint
 #HEADERS in NPS GitHub doesn't run for some reason- I end up adding my API key to the initial endpoint value
 
 
-endpoint = "https://developer.nps.gov/api/v1/parks?limit=600&api_key=O17lwXL5SQgtTqiGwPgY0VxBYkWWKpk8yTuCcHVl"
+endpoint = "https://developer.nps.gov/api/v1/parks?limit=600&api_key=<YOUR API KEY HERE>"
 req = urllib.request.Request(endpoint)
 
 
